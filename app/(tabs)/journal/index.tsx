@@ -36,6 +36,7 @@ export default function JournalScreen() {
         onChangeText={setNewEntry}
         multiline
       />
+      <Button title="Save Entry" onPress={addEntry} />
       <ScrollView style={styles.entriesContainer}>
         {entries.map((entry, index) => (
           <JournalEntry
@@ -45,9 +46,9 @@ export default function JournalScreen() {
           />
         ))}
       </ScrollView>
-      <Link href="/journal/entry">
+      {/* <Link href="/journal/entry">
         <Button title="Add New Entry" />
-      </Link>
+      </Link> */}
     </View>
   );
 }
