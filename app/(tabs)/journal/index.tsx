@@ -2,6 +2,7 @@ import { useNavigation, Link } from "expo-router";
 import { View, Text, StyleSheet, Button, ScrollView, TextInput } from "react-native";
 import { useState } from "react";
 import { JournalEntry } from "@/components/JournalEntry";
+import CustomButton from '@/components/CustomButton';
 
 interface Entry {
   title: string;
@@ -36,7 +37,9 @@ export default function JournalScreen() {
         onChangeText={setNewEntry}
         multiline
       />
-      <Button title="Save Entry" onPress={addEntry} />
+      <CustomButton styleType ="primary" onClick={addEntry}>
+        Save Entry
+      </CustomButton>
       <ScrollView style={styles.entriesContainer}>
         {entries.map((entry, index) => (
           <JournalEntry
@@ -46,9 +49,6 @@ export default function JournalScreen() {
           />
         ))}
       </ScrollView>
-      {/* <Link href="/journal/entry">
-        <Button title="Add New Entry" />
-      </Link> */}
     </View>
   );
 }
