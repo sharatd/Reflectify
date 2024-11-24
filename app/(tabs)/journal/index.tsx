@@ -1,37 +1,63 @@
 import { useNavigation, Link } from "expo-router";
 import { View, Text, StyleSheet, Button, ScrollView, TextInput } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { JournalEntry } from "@/components/JournalEntry";
 import CustomButton from '@/components/CustomButton';
+import { db, storage } from '@/firebaseConfig';
+import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface Entry {
+  id: string;
   title: string;
   content: string;
 }
 
 export default function JournalScreen() {
-  const [entries, setEntries] = useState<Entry[]>([
-    { title: "Entry 1", content: "This is the first entry." },
-    { title: "Entry 2", content: "This is the second entry." },
-  ]);
+  const [entries, setEntries] = useState<Entry[]>([]);
   const [newEntry, setNewEntry] = useState<string>("");
-  const [selectedEntryIndex, setSelectedEntryIndex] = useState<number | null>(null)
+  const [selectedEntryIndex, setSelectedEntryIndex] = useState<number | null>(null);
 
-  const addEntry = () => {
+  useEffect(() => {
+    const fetchEntries = async () => {
+      const querySnapshot = await getDocs(collection(db, "journalEntries"));
+      const entriesData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Entry[];
+      setEntries(entriesData);
+    }
+
+    fetchEntries();
+  }, []);
+
+  const addEntry = async () => {
     if (newEntry.trim()) {
       const newEntryObject = {
         title: `Entry: ${entries.length + 1}`,
         content: newEntry,
       };
-      setEntries([...entries, newEntryObject]);
+      const docRef = await addDoc(collection(db, "journalEntries"), newEntryObject);
+      setEntries([...entries, {id: docRef.id, ...newEntryObject}]);
       setNewEntry("");
     }
   };
   
-  const deleteEntry = (index: number) => {
-    const updatedEntries = entries.filter((_, i) => i !== index)
+  const deleteEntry = async (index: number) => {
+    const entryToDelete = entries[index];
+    await deleteDoc(doc(db, "journalEntries", entryToDelete.id));
+    const updatedEntries = entries.filter((_, i) => i !== index);
     setEntries(updatedEntries)
     setSelectedEntryIndex(null)
+  }
+
+  const uploadEntryToStorage = async () => {
+    const sampleEntry = { title: 'Sample Entry', content: 'This is a sample entry' };
+    const entryBlob = new Blob([JSON.stringify(sampleEntry)], { type: 'application/json' });
+    const storageRef = ref(storage, `journalEntries/${Date.now()}.json`);
+    await uploadBytes(storageRef, entryBlob);
+    const downloadURL = await getDownloadURL(storageRef);
+    console.log('File available at ', downloadURL);
   }
 
   return (
@@ -47,10 +73,13 @@ export default function JournalScreen() {
       <CustomButton styleType ="primary" onClick={addEntry}>
         Save Entry
       </CustomButton>
+      <CustomButton styleType="primary" onClick={uploadEntryToStorage}>
+        Upload Entry to Storage
+      </CustomButton>
       <ScrollView style={styles.entriesContainer}>
         {entries.map((entry, index) => (
           <JournalEntry
-            key={index}
+            key={entry.id}
             title={entry.title}
             content={entry.content}
             onSelect={() => setSelectedEntryIndex(index)}
