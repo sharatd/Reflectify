@@ -1,33 +1,49 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { useState } from "react";
+import CustomButton from '@/components/CustomButton';
 
 interface JournalEntryProps {
-    title: string;
-    content: string;
+  title: string;
+  content: string;
+  onSelect: () => void;
+  onDelete: () => void;
+  isSelected: boolean;
 }
 
-export function JournalEntry({ title, content }: JournalEntryProps) {
-    
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.content}>{content}</Text>
-        </View>
-    )
+export function JournalEntry({
+  title,
+  content,
+  onDelete,
+  onSelect,
+  isSelected
+}: JournalEntryProps) {
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity onPress={onSelect}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.content}>{content}</Text>
+      </TouchableOpacity>
+      {isSelected && (
+        <CustomButton styleType="danger" onClick={onDelete}>
+            Delete Entry
+        </CustomButton>
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        padding: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: 'gray',
-    },
-    title: {
-        fontSize: 18, 
-        fontWeight: 'bold',
-    },
-    content: {
-        marginTop: 8,
-        fontSize: 16,
-    },
-})
+  container: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "gray",
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  content: {
+    marginTop: 8,
+    fontSize: 16,
+  },
+});

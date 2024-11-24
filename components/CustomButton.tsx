@@ -4,7 +4,7 @@ import { StylesOrDefault } from 'react-native-reanimated';
 
 interface CustomButtonProps {
     /** Type of style to be applied */
-    styleType: 'primary';
+    styleType: 'primary' | 'danger';
     /** The content to be displayed inside the button */
     children: React.ReactNode;
     /** Callback function invoked when the button is clicked */
@@ -28,6 +28,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     const buttonStyles = [
         styles.button,
         styleType === 'primary' && styles.primary,
+        styleType === 'danger' && styles.danger,
     ];
 
     return (
@@ -51,6 +52,9 @@ const styles = StyleSheet.create({
     },
     primary: {
         backgroundColor: '#1d74ad', //Blue
+    },
+    danger: {
+        backgroundColor: '#d9534f', // Red
     },
     text: {
         color: '#ffffff', //white

@@ -18,3 +18,7 @@
 .primary {
     @include button-primary;
 }
+
+.danger {
+    @include button-danger;
+}

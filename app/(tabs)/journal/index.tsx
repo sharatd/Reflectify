@@ -15,6 +15,7 @@ export default function JournalScreen() {
     { title: "Entry 2", content: "This is the second entry." },
   ]);
   const [newEntry, setNewEntry] = useState<string>("");
+  const [selectedEntryIndex, setSelectedEntryIndex] = useState<number | null>(null)
 
   const addEntry = () => {
     if (newEntry.trim()) {
@@ -26,6 +27,12 @@ export default function JournalScreen() {
       setNewEntry("");
     }
   };
+  
+  const deleteEntry = (index: number) => {
+    const updatedEntries = entries.filter((_, i) => i !== index)
+    setEntries(updatedEntries)
+    setSelectedEntryIndex(null)
+  }
 
   return (
     <View style={styles.container}>
@@ -46,6 +53,9 @@ export default function JournalScreen() {
             key={index}
             title={entry.title}
             content={entry.content}
+            onSelect={() => setSelectedEntryIndex(index)}
+            onDelete={() => deleteEntry(index)}
+            isSelected={selectedEntryIndex === index}
           />
         ))}
       </ScrollView>
