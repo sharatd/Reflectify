@@ -22,3 +22,7 @@
 .danger {
     @include button-danger;
 }
+
+.disabled {
+    @include button-disabled;
+}

@@ -29,60 +29,75 @@ interface Entry {
 export default function JournalScreen() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [newEntry, setNewEntry] = useState<string>("");
-  const [selectedEntryIndex, setSelectedEntryIndex] = useState<number | null>(
-    null
-  );
+  const [isUploading, setIsUploading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchEntries = async () => {
-      const querySnapshot = await getDocs(collection(db, "journalEntries"));
-      const entriesData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Entry[];
-      setEntries(entriesData);
+      try {
+        const querySnapshot = await getDocs(collection(db, "journalEntries"));
+        const entriesData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Entry[];
+        setEntries(entriesData);
+      } catch (error) {
+        console.error("Error fetching entries:", error);
+      }
     };
 
     fetchEntries();
   }, []);
 
-  const addEntry = async () => {
-    if (newEntry.trim()) {
+  const handleSaveAndUpload = async () => {
+    if (!newEntry.trim()) return;
+
+    setIsUploading(true); // Indicate that a save/upload is in progress
+
+    try {
+      // Create a new entry object
       const newEntryObject = {
         title: `Entry: ${entries.length + 1}`,
         content: newEntry,
       };
+
+      // Save the entry to Firestore
       const docRef = await addDoc(
         collection(db, "journalEntries"),
         newEntryObject
       );
-      setEntries([...entries, { id: docRef.id, ...newEntryObject }]);
-      setNewEntry("");
-    }
-  };
 
-  const deleteEntry = async (index: number) => {
-    const entryToDelete = entries[index];
-    await deleteDoc(doc(db, "journalEntries", entryToDelete.id));
-    const updatedEntries = entries.filter((_, i) => i !== index);
-    setEntries(updatedEntries);
-    setSelectedEntryIndex(null);
-  };
-
-  const uploadEntryToStorage = async () => {
-    if (newEntry.trim()) {
-      const newEntryObject = {
-        title: `Entry: ${entries.length + 1}`,
-        content: newEntry,
-      };
+      // Upload the entry to Firebase Storage
       const entryBlob = new Blob([JSON.stringify(newEntryObject)], {
         type: "application/json",
       });
-
       const storageRef = ref(storage, `journalEntries/${Date.now()}.json`);
       await uploadBytes(storageRef, entryBlob);
       const downloadURL = await getDownloadURL(storageRef);
-      console.log("File available at ", downloadURL);
+      console.log("Entry uploaded t0 Storage. File available at ", downloadURL);
+
+      // Update the entries state with the new entry
+      setEntries((prevEntries) => [
+        ...prevEntries,
+        { id: docRef.id, ...newEntryObject },
+      ]);
+
+      // Clear the input field
+      setNewEntry("");
+    } catch (error) {
+      console.error("Error saving and uploading entry:", error);
+    } finally {
+      setIsUploading(false); // Reset uploading state after save/upload is complete
+    }
+  };
+
+  const deleteEntry = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "journalEntries", id));
+      setEntries((prevEntries) =>
+        prevEntries.filter((entry) => entry.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting entry:", error);
     }
   };
 
@@ -96,11 +111,12 @@ export default function JournalScreen() {
         onChangeText={setNewEntry}
         multiline
       />
-      <CustomButton styleType="primary" onClick={addEntry}>
-        Save Entry
-      </CustomButton>
-      <CustomButton styleType="primary" onClick={uploadEntryToStorage}>
-        Upload Entry to Storage
+      <CustomButton
+        styleType="primary"
+        onClick={handleSaveAndUpload}
+        disabled={isUploading}
+      >
+        {isUploading ? "Uploading..." : "Save and Upload Entry"}
       </CustomButton>
       <ScrollView style={styles.entriesContainer}>
         {entries.map((entry, index) => (
@@ -108,9 +124,9 @@ export default function JournalScreen() {
             key={entry.id}
             title={entry.title}
             content={entry.content}
-            onSelect={() => setSelectedEntryIndex(index)}
-            onDelete={() => deleteEntry(index)}
-            isSelected={selectedEntryIndex === index}
+            onSelect={() => {}}
+            onDelete={() => deleteEntry(entry.id)}
+            isSelected={false}
           />
         ))}
       </ScrollView>

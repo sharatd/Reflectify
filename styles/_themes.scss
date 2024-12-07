@@ -26,3 +26,8 @@ $button-danger-background: $color-not-red;
     background-color: $button-danger-background;
     color: $button-primary-text;
 }
+
+@mixin button-disabled {
+    background-color: $button-disabled-background;
+    color: $button-disabled-text;
+}
