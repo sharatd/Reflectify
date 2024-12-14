@@ -73,7 +73,7 @@ export default function JournalScreen() {
       const storageRef = ref(storage, `journalEntries/${Date.now()}.json`);
       await uploadBytes(storageRef, entryBlob);
       const downloadURL = await getDownloadURL(storageRef);
-      console.log("Entry uploaded t0 Storage. File available at ", downloadURL);
+      console.log("Entry uploaded to Storage. File available at ", downloadURL);
 
       // Update the entries state with the new entry
       setEntries((prevEntries) => [
