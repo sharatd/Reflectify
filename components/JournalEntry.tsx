@@ -18,7 +18,7 @@ export function JournalEntry({
   isSelected
 }: JournalEntryProps) {
   return (
-    <View style={styles.container}>
+    <View style={styles.card}>
       <TouchableOpacity onPress={onSelect}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.content}>{content}</Text>
@@ -33,10 +33,16 @@ export function JournalEntry({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "gray",
+  card: {
+    padding: 10,
+    marginVertical: 8,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   title: {
     fontSize: 18,
