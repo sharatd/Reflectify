@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useState } from "react";
-import CustomButton from '@/components/CustomButton';
+import CustomButton from "@/components/CustomButton";
 
 interface JournalEntryProps {
   title: string;
@@ -15,20 +15,16 @@ export function JournalEntry({
   content,
   onDelete,
   onSelect,
-  isSelected
+  isSelected,
 }: JournalEntryProps) {
   return (
-    <View style={styles.card}>
-      <TouchableOpacity onPress={onSelect}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.content}>{content}</Text>
-      </TouchableOpacity>
-      {isSelected && (
-        <CustomButton styleType="danger" onClick={onDelete}>
-            Delete Entry
-        </CustomButton>
-      )}
-    </View>
+    <TouchableOpacity
+      onPress={onSelect}
+      style={[styles.card, isSelected && styles.selectedCard]}
+    >
+      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.content}>{content}</Text>
+    </TouchableOpacity>
   );
 }
 
@@ -39,10 +35,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#fff",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+  },
+  selectedCard: {
+    backgroundColor: '#e6f2ff',
+    borderWidth: 1,
+    borderColor: 'blue',
   },
   title: {
     fontSize: 18,

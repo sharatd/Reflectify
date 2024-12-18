@@ -30,6 +30,7 @@ export default function JournalScreen() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [newEntry, setNewEntry] = useState<string>("");
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
 
   useEffect(() => {
     const fetchEntries = async () => {
@@ -101,6 +102,15 @@ export default function JournalScreen() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!selectedEntry) return;
+    await deleteEntry(selectedEntry.id)
+  }
+
+  const handleSelectedEntry = (entry: Entry) => {
+    setSelectedEntry(entry)
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}> Journal </Text>
@@ -118,15 +128,18 @@ export default function JournalScreen() {
       >
         {isUploading ? "Uploading..." : "Save and Upload Entry"}
       </CustomButton>
+      <CustomButton styleType="danger" onClick={handleDelete} disabled={!selectedEntry}>
+        Delete Selected Entry
+      </CustomButton>
       <ScrollView style={styles.entriesContainer}>
-        {entries.map((entry, index) => (
+        {entries.map((entry) => (
           <JournalEntry
             key={entry.id}
             title={entry.title}
             content={entry.content}
-            onSelect={() => {}}
+            onSelect={() => handleSelectedEntry(entry)}
             onDelete={() => deleteEntry(entry.id)}
-            isSelected={false}
+            isSelected={selectedEntry?.id === entry.id}
           />
         ))}
       </ScrollView>
