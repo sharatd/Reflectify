@@ -17,6 +17,7 @@ import {
   getDocs,
   deleteDoc,
   doc,
+  onSnapshot,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -28,26 +29,40 @@ interface Entry {
 
 export default function JournalScreen() {
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [newEntryTitle, setNewEntryTitle] = useState<string>("");
   const [newEntry, setNewEntry] = useState<string>("");
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
 
   useEffect(() => {
-    const fetchEntries = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "journalEntries"));
+    const unsubscribe = onSnapshot(
+      collection(db, "journalEntries"),
+      (querySnapshot: { docs: any[] }) => {
         const entriesData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         })) as Entry[];
         setEntries(entriesData);
-      } catch (error) {
-        console.error("Error fetching entries:", error);
-      }
-    };
+      },
+      (error: any) => console.error("Error listening for changes:", error)
+    );
 
-    fetchEntries();
+    return () => unsubscribe(); // Clean up listener on unmount
   }, []);
+  // const fetchEntries = async () => {
+  //   try {
+  //     const querySnapshot = await getDocs(collection(db, "journalEntries"));
+  //     const entriesData = querySnapshot.docs.map((doc) => ({
+  //       id: doc.id,
+  //       ...doc.data(),
+  //     })) as Entry[];
+  //     setEntries(entriesData);
+  //   } catch (error) {
+  //     console.error("Error fetching entries:", error);
+  //   }
+  // };
+
+  // fetchEntries();
 
   const handleSaveAndUpload = async () => {
     if (!newEntry.trim()) return;
@@ -57,7 +72,7 @@ export default function JournalScreen() {
     try {
       // Create a new entry object
       const newEntryObject = {
-        title: `Entry: ${entries.length + 1}`,
+        title: newEntryTitle,
         content: newEntry,
       };
 
@@ -71,19 +86,20 @@ export default function JournalScreen() {
       const entryBlob = new Blob([JSON.stringify(newEntryObject)], {
         type: "application/json",
       });
-      const storageRef = ref(storage, `journalEntries/${Date.now()}.json`);
+      const storageRef = ref(storage, `journalEntries/${newEntryTitle}.json`);
       await uploadBytes(storageRef, entryBlob);
       const downloadURL = await getDownloadURL(storageRef);
       console.log("Entry uploaded to Storage. File available at ", downloadURL);
 
       // Update the entries state with the new entry
-      setEntries((prevEntries) => [
-        ...prevEntries,
-        { id: docRef.id, ...newEntryObject },
-      ]);
+      // setEntries((prevEntries) => [
+      //   ...prevEntries,
+      //   { id: docRef.id, ...newEntryObject },
+      // ]);
 
-      // Clear the input field
+      // Clear the input field and title field
       setNewEntry("");
+      setNewEntryTitle("");
     } catch (error) {
       console.error("Error saving and uploading entry:", error);
     } finally {
@@ -104,16 +120,22 @@ export default function JournalScreen() {
 
   const handleDelete = async () => {
     if (!selectedEntry) return;
-    await deleteEntry(selectedEntry.id)
-  }
+    await deleteEntry(selectedEntry.id);
+  };
 
   const handleSelectedEntry = (entry: Entry) => {
-    setSelectedEntry(entry)
-  }
+    setSelectedEntry(entry);
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}> Journal </Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Write your entry title here..."
+        value={newEntryTitle}
+        onChangeText={setNewEntryTitle}
+      />
       <TextInput
         style={styles.input}
         placeholder="Write your journal entry here..."
@@ -128,7 +150,11 @@ export default function JournalScreen() {
       >
         {isUploading ? "Uploading..." : "Save and Upload Entry"}
       </CustomButton>
-      <CustomButton styleType="danger" onClick={handleDelete} disabled={!selectedEntry}>
+      <CustomButton
+        styleType="danger"
+        onClick={handleDelete}
+        disabled={!selectedEntry}
+      >
         Delete Selected Entry
       </CustomButton>
       <ScrollView style={styles.entriesContainer}>
