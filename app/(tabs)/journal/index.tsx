@@ -1,4 +1,3 @@
-import { useNavigation, Link } from "expo-router";
 import {
   View,
   Text,
@@ -49,20 +48,6 @@ export default function JournalScreen() {
 
     return () => unsubscribe(); // Clean up listener on unmount
   }, []);
-  // const fetchEntries = async () => {
-  //   try {
-  //     const querySnapshot = await getDocs(collection(db, "journalEntries"));
-  //     const entriesData = querySnapshot.docs.map((doc) => ({
-  //       id: doc.id,
-  //       ...doc.data(),
-  //     })) as Entry[];
-  //     setEntries(entriesData);
-  //   } catch (error) {
-  //     console.error("Error fetching entries:", error);
-  //   }
-  // };
-
-  // fetchEntries();
 
   const handleSaveAndUpload = async () => {
     if (!newEntry.trim()) return;
@@ -89,13 +74,6 @@ export default function JournalScreen() {
       const storageRef = ref(storage, `journalEntries/${newEntryTitle}.json`);
       await uploadBytes(storageRef, entryBlob);
       const downloadURL = await getDownloadURL(storageRef);
-      console.log("Entry uploaded to Storage. File available at ", downloadURL);
-
-      // Update the entries state with the new entry
-      // setEntries((prevEntries) => [
-      //   ...prevEntries,
-      //   { id: docRef.id, ...newEntryObject },
-      // ]);
 
       // Clear the input field and title field
       setNewEntry("");
