@@ -19,6 +19,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { journalStyles } from '@/styles/journalStyles';
 
 interface Entry {
   id: string;
@@ -106,16 +107,16 @@ export default function JournalScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}> Journal </Text>
+    <View style={journalStyles.container}>
+      <Text style={journalStyles.title}> Journal </Text>
       <TextInput
-        style={styles.input}
+        style={journalStyles.input}
         placeholder="Write your entry title here..."
         value={newEntryTitle}
         onChangeText={setNewEntryTitle}
       />
       <TextInput
-        style={styles.input}
+        style={journalStyles.input}
         placeholder="Write your journal entry here..."
         value={newEntry}
         onChangeText={setNewEntry}
@@ -135,7 +136,7 @@ export default function JournalScreen() {
       >
         Delete Selected Entry
       </CustomButton>
-      <ScrollView style={styles.entriesContainer}>
+      <ScrollView style={journalStyles.entriesContainer}>
         {entries.map((entry) => (
           <JournalEntry
             key={entry.id}
@@ -151,25 +152,3 @@ export default function JournalScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "white",
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  input: {
-    height: 100,
-    borderColor: "gray",
-    borderWidth: 1,
-    padding: 8,
-    marginBottom: 16,
-  },
-  entriesContainer: {
-    marginTop: 16,
-  },
-});
