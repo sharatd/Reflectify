@@ -33,8 +33,13 @@ export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
       <ParallaxScrollView
-        headerImage={<Image source={require("@/assets/images/partial-react-logo.png")} style={{ width: '100%', height: 200 }} />}
-        headerBackgroundColor={{ dark: '#000', light: '#fff' }}
+        headerImage={
+          <Image
+            source={require("@/assets/images/partial-react-logo.png")}
+            style={{ width: "100%", height: 200 }}
+          />
+        }
+        headerBackgroundColor={{ dark: "#000", light: "#fff" }}
       >
         <HelloWave />
         <ThemedText> Welcome to the Journal App</ThemedText>

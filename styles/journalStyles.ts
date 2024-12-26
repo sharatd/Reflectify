@@ -1,19 +1,19 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 export const journalStyles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   title: {
     fontSize: 24,
     marginBottom: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
   input: {
     height: 100,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     padding: 8,
     marginBottom: 16,

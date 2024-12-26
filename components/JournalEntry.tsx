@@ -41,9 +41,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   selectedCard: {
-    backgroundColor: '#e6f2ff',
+    backgroundColor: "#e6f2ff",
     borderWidth: 1,
-    borderColor: 'blue',
+    borderColor: "blue",
   },
   title: {
     fontSize: 18,

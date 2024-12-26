@@ -19,7 +19,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { journalStyles } from '@/styles/journalStyles';
+import { journalStyles } from "@/styles/journalStyles";
 
 interface Entry {
   id: string;
@@ -151,4 +151,3 @@ export default function JournalScreen() {
     </View>
   );
 }
-
