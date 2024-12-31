@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Button,
-  ScrollView,
-  TextInput,
-} from "react-native";
+import { View, Text, ScrollView, TextInput } from "react-native";
 import { useState, useEffect } from "react";
 import { JournalEntry } from "@/components/JournalEntry";
 import CustomButton from "@/components/CustomButton";
@@ -13,7 +6,6 @@ import { db, storage } from "@/firebaseConfig";
 import {
   collection,
   addDoc,
-  getDocs,
   deleteDoc,
   doc,
   onSnapshot,
@@ -24,6 +16,7 @@ import { journalStyles } from "@/styles/journalStyles";
 interface Entry {
   id: string;
   title: string;
+  hashtags: string;
   content: string;
 }
 
@@ -33,6 +26,7 @@ export default function JournalScreen() {
   const [newEntry, setNewEntry] = useState<string>("");
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
+  const [entryHashtags, setEntryHashtags] = useState<string>("");
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -59,6 +53,7 @@ export default function JournalScreen() {
       // Create a new entry object
       const newEntryObject = {
         title: newEntryTitle,
+        hashtags: entryHashtags,
         content: newEntry,
       };
 
@@ -79,6 +74,7 @@ export default function JournalScreen() {
       // Clear the input field and title field
       setNewEntry("");
       setNewEntryTitle("");
+      setEntryHashtags("");
     } catch (error) {
       console.error("Error saving and uploading entry:", error);
     } finally {
@@ -117,6 +113,12 @@ export default function JournalScreen() {
       />
       <TextInput
         style={journalStyles.input}
+        placeholder="Any hashtags for this entry?"
+        value={entryHashtags}
+        onChangeText={setEntryHashtags}
+      />
+      <TextInput
+        style={journalStyles.input}
         placeholder="Write your journal entry here..."
         value={newEntry}
         onChangeText={setNewEntry}
@@ -141,6 +143,7 @@ export default function JournalScreen() {
           <JournalEntry
             key={entry.id}
             title={entry.title}
+            hashtags={entry.hashtags}
             content={entry.content}
             onSelect={() => handleSelectedEntry(entry)}
             onDelete={() => deleteEntry(entry.id)}

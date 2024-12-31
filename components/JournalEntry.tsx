@@ -4,6 +4,7 @@ import CustomButton from "@/components/CustomButton";
 
 interface JournalEntryProps {
   title: string;
+  hashtags: string;
   content: string;
   onSelect: () => void;
   onDelete: () => void;
@@ -12,6 +13,7 @@ interface JournalEntryProps {
 
 export function JournalEntry({
   title,
+  hashtags,
   content,
   onDelete,
   onSelect,
@@ -23,6 +25,7 @@ export function JournalEntry({
       style={[styles.card, isSelected && styles.selectedCard]}
     >
       <Text style={styles.title}>{title}</Text>
+      <Text style={styles.content}>{hashtags}</Text>
       <Text style={styles.content}>{content}</Text>
     </TouchableOpacity>
   );
