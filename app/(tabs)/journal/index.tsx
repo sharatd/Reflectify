@@ -44,16 +44,45 @@ export default function JournalScreen() {
     return () => unsubscribe(); // Clean up listener on unmount
   }, []);
 
+  const formatHashtags = (hashtags: string): string => {
+    //Split on any whitespace
+    const parts = hashtags.split(/\s+/);
+    console.log("Raw input:", hashtags);
+    console.log("Split parts:", parts);
+
+    const processed = parts
+      .map((tag) => {
+        //Trim to remove extra spaces
+        const trimmed = tag.trim();
+        if (!trimmed) return "";
+
+        // Remove leading # symbols
+        const noHashes = trimmed.replace(/^#+/, "");
+
+        // Add single # if there's anything left
+        const finalTag = noHashes ? `#${noHashes}` : "";
+        console.log(`Tag "${tag}" => "${finalTag}"`);
+        return finalTag;
+      })
+      .filter(Boolean) //remove empty results
+      .join(" ");
+
+    console.log("Final hashtags:", processed);
+    return processed;
+  };
+
   const handleSaveAndUpload = async () => {
     if (!newEntry.trim()) return;
 
     setIsUploading(true); // Indicate that a save/upload is in progress
 
     try {
+      const formattedHashtags = formatHashtags(entryHashtags);
+
       // Create a new entry object
       const newEntryObject = {
         title: newEntryTitle,
-        hashtags: entryHashtags,
+        hashtags: formattedHashtags,
         content: newEntry,
       };
 
